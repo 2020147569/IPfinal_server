@@ -1,0 +1,22 @@
+{
+  "name": "ipfinal_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "\u001b[D\u001b[D\u001b[D\u001bserver.js)",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/2020147569/IPfinal_server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/2020147569/IPfinal_server/issues"
+  },
+  "homepage": "https://github.com/2020147569/IPfinal_server#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
