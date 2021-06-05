@@ -52,7 +52,7 @@ app.get('/', (req, res) => {
     }
     
     console.log(mylist);
-    res.json(mylist);
+    res.send(JSON.stringify(mylist));
 })
 
 function findHate(from, condition){
