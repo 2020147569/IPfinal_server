@@ -5,62 +5,23 @@ const request = require('request');
 const cors = require('cors');
 
 app.use(express.json());
-var conf = {
+app.use(cors());
 
-    // look for PORT environment variable,
-    // else look for CLI argument,
-    // else use hard coded value for port 8080
-    port: process.env.PORT || process.argv[2] || 8080,
-
-    // origin undefined
-    // see https://github.com/expressjs/cors/issues/71
-    originUndefined: function (req, res, next) {
-
-        if (!req.headers.origin) {
-
-            res.json({
-
-                mess: 'Hi you are visiting the service locally. If this was a CORS the origin header shoud not be undefined'
-
-            });
-
-        } else {
-
-            next();
-
-        }
-
-    },
-
-    // Cross Origin Resource Sharing Options
-    cors: {
-
-        // origin handler
-        origin: function (origin, cb) {
-
-            // setup a white list
-            let wl = ['https://2020147569.github.io'];
-
-            if (wl.indexOf(origin) != -1) {
-
-                cb(null, true);
-
-            } else {
-
-                cb(new Error('invalid origin: ' + origin), false);
-
-            }
-
-        },
-
-        optionsSuccessStatus: 200
-
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested, Content-Type, Accept Authorization"
+    )
+    if (req.method === "OPTIONS") {
+      res.header(
+        "Access-Control-Allow-Methods",
+        "POST, PUT, PATCH, GET, DELETE"
+      )
+      return res.status(200).json({})
     }
-
-};
-
-// use origin undefined handler, then cors
-app.use(conf.originUndefined, cors(conf.cors));
+    next()
+  })
 
 app.post('/', async(req, res) => {
     /*let category = req.body.category;
@@ -251,6 +212,6 @@ async function checkWeather(wdate, loc){
 }
 
 var port = process.env.PORT || 5000;
-app.listen(conf.port, function(){
+app.listen(port, function(){
     console.log("server on, port: " + port);
 })
