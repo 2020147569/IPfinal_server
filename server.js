@@ -1,11 +1,19 @@
-const { ENOENT } = require('constants');
 var express = require('express');
 var app = express();
 const fs = require('fs');
-const fetch = require('node-fetch');
+const request = require('request');
 
 app.use(express.json())
-app.get('/', (req, res) => {
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", '*');
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
+    next();
+});
+
+app.post('/', async(req, res) => {
     /*let category = req.body.category;
     let people = req.body.pnum;
     let time = req.body.time;
@@ -25,13 +33,16 @@ app.get('/', (req, res) => {
     else{
         newminute = 0;
     }
+    let wdate = new Date();
+    wdate.setHours(newhour, newminute);
+    console.log(date);
+    console.log(wdate);
     var mylist;
     let category = ["양식", "중식", "일식", "PC방", "볼링장", "노래방", "코인 노래방", "공원", "당구장", "방탈출", "박물관", "보드 게임 카페", "카페", "주점", "미술관", "연극극장", "백화점", "마사지", "아쿠아리움", "사진관", "만화카페"];
-    console.log(category);
     let hate = ["양식", "중식", "일식"];
     let map = new Object();
-    let lon = 126.847321;
-    let lat = 37.615719;
+    let lon = 126.929810;
+    let lat = 37.488201;
     map.Re = 6371.00877;
     map.grid = 5.0;
     map.slat1 = 30.0;
@@ -42,29 +53,35 @@ app.get('/', (req, res) => {
     map.yo = 675/map.grid;
     let XY = getXY(lon, lat, map);
     console.log(XY);
-    let url = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getUltraSrtFcst?serviceKey=mg9I4VBCmTi1FupAyPU4QJUjbv98AeUk7CUsce7asBAeDDKgPzQWd3PzXukCX2w2wObVx85vt2KkVqWbzXWfVQ%3D%3D";
-    url += "&numOfRows=100";
-    url += "&pageNo=1";
-    url += "&base_date=" + 30;
-    fs.readFile('time.json', 'utf8', function(err, data){
-        if(err){
+    let raining = await checkWeather(wdate, XY);
+    console.log(raining);
+    fs.readFile('time.json', 'utf8', function (err, data) {
+        if (err) {
             console.log(err);
             res.status(404).send(err);
             res.end();
         }
-        console.log(data);
         let contents = JSON.parse(data);
-        console.log(contents);
         mylist = findFromContents(category, contents);
-        console.log(mylist);
         mylist = findHate(mylist, hate);
         console.log("final list");
         console.log(mylist);
-        //let textlist = JSON.stringify(mylist);
-        //console.log("text version list");
-        //console.log(textlist);
-        //res.send(JSON.stringify(textlist));
-        res.json(mylist);
+        res.status(200);
+        res.json([{
+            "place_name": "카카오프렌즈 코엑스점",
+            "distance": "418",
+            "place_url": "http://place.map.kakao.com/26338954",
+            "category_name": "가정,생활 > 문구,사무용품 > 디자인문구 > 카카오프렌즈",
+            "address_name": "서울 강남구 삼성동 159",
+            "road_address_name": "서울 강남구 영동대로 513",
+            "id": "26338954",
+            "phone": "02-6002-1880",
+            "category_group_code": "",
+            "category_group_name": "",
+            "x": "127.05902969025047",
+            "y": "37.51207412593136"
+          }]);
+        //res.json(mylist);
     });
 })
 
@@ -113,35 +130,21 @@ function findFromContents(from, content){
 }
 
 function getXY(lon, lat, map){
-    console.log("lon: " + lon + ", lat: " + lat);
-    console.log(map);
     let PI = Math.PI;
-    console.log(PI);
     let DEGRAD = PI / 180.0;
-    console.log(DEGRAD);
     let re = map.Re / map.grid;
-    console.log(re);
     let slat1 = map.slat1 * DEGRAD;
-    console.log(slat1);
     let slat2 = map.slat2 * DEGRAD;
-    console.log(slat2);
     let olon = map.olon * DEGRAD;
-    console.log(olon);
     let olat = map.olat * DEGRAD;
-    console.log(olat);
     let sn = Math.tan(PI * 0.25 + slat2 * 0.5) / Math.tan(PI * 0.25 + slat1 * 0.5);
     sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
-    console.log(sn);
     let sf = Math.tan(PI*0.25 + slat1 * 0.5);
     sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
-    console.log(sf);
     let ro = Math.tan(PI * 0.25 + olat * 0.5);
     ro = re * sf / Math.pow(ro, sn);
-    console.log(ro);
     let ra = Math.tan(PI * 0.25 + lat * DEGRAD * 0.5);
-    console.log(ra);
     ra = re * sf / Math.pow(ra, sn);
-    console.log(ra);
     let theta = lon * DEGRAD - olon;
     if(theta > PI){
         theta -= 2 * PI;
@@ -150,14 +153,52 @@ function getXY(lon, lat, map){
         theta += 2 * PI;
     }
     theta *= sn;
-    console.log(theta);
     let x = ra * Math.sin(theta) + map.xo;
     let y = ro - ra * Math.cos(theta) + map.yo;
-    console.log("x: " + x);
-    console.log("y: " + y);
     x = parseInt(x + 1.5);
     y = parseInt(y + 1.5);
     return [x, y];
+}
+
+async function checkWeather(wdate, loc){
+    newhour = wdate.getHours();
+    newminute = wdate.getMinutes();
+    let url = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?serviceKey=mg9I4VBCmTi1FupAyPU4QJUjbv98AeUk7CUsce7asBAeDDKgPzQWd3PzXukCX2w2wObVx85vt2KkVqWbzXWfVQ%3D%3D";
+    url += "&numOfRows=100";
+    url += "&dataType=JSON";
+    url += "&pageNo=1";
+    url += "&base_date=" + wdate.getFullYear();
+    if(wdate.getMonth() + 1 < 10){
+        url += 0;
+    }
+    url += (wdate.getMonth() + 1);
+    if(wdate.getDate() < 10){
+        url += 0;
+    }
+    url += wdate.getDate();
+    if(newhour < 10){
+        url += 0;
+    }
+    url += "&base_time=" + newhour;
+    if(newminute == 0){
+        url += "00";
+    }
+    else{
+        url += "30";
+    }
+    url += "&nx=" + loc[0];
+    url += "&ny=" + loc[1];
+    console.log(url);
+    fetch("http://apis.data.go.kr/1360000/VilageFcstInfoService/getUltraSrtFcst?serviceKey=mg9I4VBCmTi1FupAyPU4QJUjbv98AeUk7CUsce7asBAeDDKgPzQWd3PzXukCX2w2wObVx85vt2KkVqWbzXWfVQ%3D%3D&pageNo=1&numOfRows=100&dataType=JSON&base_date=20210606&base_time=1829&nx=55&ny=127")
+    .then(response => response.JSON)
+    .then(function(data){
+        return data;
+    })
+    .catch(function(err){
+        console.log(err);
+        return false;
+    })
+
 }
 
 var port = process.env.PORT || 5000;
