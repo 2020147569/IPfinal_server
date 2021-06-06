@@ -183,15 +183,6 @@ async function checkWeather(wdate, loc){
     url += "&nx=" + loc[0];
     url += "&ny=" + loc[1];
     console.log(url);
-    fetch("http://apis.data.go.kr/1360000/VilageFcstInfoService/getUltraSrtFcst?serviceKey=mg9I4VBCmTi1FupAyPU4QJUjbv98AeUk7CUsce7asBAeDDKgPzQWd3PzXukCX2w2wObVx85vt2KkVqWbzXWfVQ%3D%3D&pageNo=1&numOfRows=100&dataType=JSON&base_date=20210606&base_time=1829&nx=55&ny=127")
-    .then(response => response.JSON)
-    .then(function(data){
-        return data;
-    })
-    .catch(function(err){
-        console.log(err);
-        return false;
-    })
 
 }
 
