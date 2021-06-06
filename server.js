@@ -7,7 +7,7 @@ const cors = require('cors');
 app.use(express.json());
 app.use(cors());
 
-app.get('/', async(req, res) => {
+app.post('/', async(req, res) => {
     /*let category = req.body.category;
     let people = req.body.pnum;
     let time = req.body.time;
