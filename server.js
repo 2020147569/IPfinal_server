@@ -78,7 +78,7 @@ app.use((req, res, next) => {
     next()
   })
 
-app.post('/', async(req, res) => {
+app.get('/', async(req, res) => {
     /*let category = req.body.category;
     let people = req.body.pnum;
     let time = req.body.time;
