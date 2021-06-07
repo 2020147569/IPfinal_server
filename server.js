@@ -10,9 +10,10 @@ app.use(express.json());
 app.use(cors());
 
 app.post('/', (req, res) => {
-    res.send(req.body);
+    let lat = req.body.latitude;
+    res.send(lat);
 })
-app.get('/', async(req, res) => {
+//app.get('/', async(req, res) => {
     /*let category = req.body.category;
     let people = req.body.pnum;
     let time = req.body.time;
@@ -21,7 +22,7 @@ app.get('/', async(req, res) => {
     let hate = req.body.hate;
     let lon = req.body.lon;
     let lat = req.body.lat;*/
-    let date = new Date();
+    /*let date = new Date();
     let predate = new Date();
     let latdate = new Date();
     latdate.setHours(latdate.getHours() + 3);
@@ -229,7 +230,7 @@ function deleteOut(list){
         }
     }
     return newlist;
-}
+}*/
 
 var port = process.env.PORT || 5000;
 app.listen(port, function(){
