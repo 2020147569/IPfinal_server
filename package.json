@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/2020147569/IPfinal_server#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "node-fetch": "^2.6.1",
