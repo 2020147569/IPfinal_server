@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(cors());
 
 app.post('/', async(req, res) => {
-    res.json(req);
+    res.send(req);
     /*let category = req.body.category;
     let people = req.body.pnum;
     let time = req.body.time;
