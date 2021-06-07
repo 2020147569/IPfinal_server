@@ -9,7 +9,7 @@ var headers = {'Authorization': 'KakaoAK 1e92017a6f706280b10c46c94dfebd78'};
 app.use(express.json());
 app.use(cors());
 
-app.get('/', async(req, res) => {
+app.post('/', async(req, res) => {
     res.json(req);
     /*let category = req.body.category;
     let people = req.body.pnum;
