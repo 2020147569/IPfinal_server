@@ -10,8 +10,7 @@ app.use(express.json());
 app.use(cors());
 
 app.post('/', (req, res) => {
-    let lat = req.body.latitude;
-    res.send(lat);
+    res.send(req);
 })
 //app.get('/', async(req, res) => {
     /*let category = req.body.category;
