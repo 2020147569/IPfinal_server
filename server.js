@@ -4,10 +4,13 @@ const fs = require('fs');
 const request = require('request');
 const cors = require('cors');
 
+var headers = {'Authorization': 'KakaoAK 1e92017a6f706280b10c46c94dfebd78'};
+
 app.use(express.json());
 app.use(cors());
 
-app.post('/', async(req, res) => {
+app.get('/', async(req, res) => {
+    res.json(req);
     /*let category = req.body.category;
     let people = req.body.pnum;
     let time = req.body.time;
@@ -17,6 +20,9 @@ app.post('/', async(req, res) => {
     let lon = req.body.lon;
     let lat = req.body.lat;*/
     let date = new Date();
+    let predate = new Date();
+    let latdate = new Date();
+    latdate.setHours(latdate.getHours() + 3);
     let hour = date.getHours();
     let minute = date.getMinutes();
     let newhour = hour;
@@ -29,11 +35,8 @@ app.post('/', async(req, res) => {
     }
     let wdate = new Date();
     wdate.setHours(newhour, newminute);
-    console.log(date);
-    console.log(wdate);
     var mylist;
     let category = ["양식", "중식", "일식", "PC방", "볼링장", "노래방", "코인 노래방", "공원", "당구장", "방탈출", "박물관", "보드 게임 카페", "카페", "주점", "미술관", "연극극장", "백화점", "마사지", "아쿠아리움", "사진관", "만화카페"];
-    let hate = ["양식", "중식", "일식"];
     let map = new Object();
     let lon = 126.929810;
     let lat = 37.488201;
@@ -46,70 +49,74 @@ app.post('/', async(req, res) => {
     map.xo = 210/map.grid;
     map.yo = 675/map.grid;
     let XY = getXY(lon, lat, map);
-    console.log(XY);
-    let raining = await checkWeather(wdate, XY);
-    console.log(raining);
-    fs.readFile('time.json', 'utf8', function (err, data) {
-        if (err) {
-            console.log(err);
-            res.status(404).send(err);
-            res.end();
+    let wurl = getWURL(wdate, XY);
+    let raining;
+    new Promise(function(resolve, reject){
+        
+        request(wurl, function(err, res, body){
+            if(err){
+                reject(new Error("no weather file"));
+            }
+            resolve(body);
+        })
+    })
+    .then(res => JSON.parse(res))
+    .then(function(data) {
+        if(data.response.header.resultCode != '00'){
+            //날씨정보 업데이트가 안 되면 비가 오지 않는 것으로 간주
+            raining = false;
         }
-        let contents = JSON.parse(data);
-        mylist = findFromContents(category, contents);
-        mylist = findHate(mylist, hate);
-        console.log("final list");
-        console.log(mylist);
-        res.status(200);
-        res.json([{
-            "place_name": "카카오프렌즈 코엑스점",
-            "distance": "418",
-            "place_url": "http://place.map.kakao.com/26338954",
-            "category_name": "가정,생활 > 문구,사무용품 > 디자인문구 > 카카오프렌즈",
-            "address_name": "서울 강남구 삼성동 159",
-            "road_address_name": "서울 강남구 영동대로 513",
-            "id": "26338954",
-            "phone": "02-6002-1880",
-            "category_group_code": "",
-            "category_group_name": "",
-            "x": "127.05902969025047",
-            "y": "37.51207412593136"
-          }]);
-        //res.json(mylist);
-    });
+        else{
+            raining = checkWeather(data.response.body.items, predate, latdate);
+        }
+    })
+    .catch(function(err){
+        raining = false;
+    })
+    .finally(function(){
+        fs.readFile('time.json', 'utf8', function (err, data) {
+            if (err) {
+                console.log(err);
+                res.status(404).send(err);
+                res.end();
+            }
+            let contents = JSON.parse(data);
+            mylist = findPref(category, contents);
+            if(raining){
+                mylist = deleteOut(mylist);
+            }
+            var options = {
+                url: 'https://dapi.kakao.com/v2/local/search/keyword.json?y=37.514322572335935&x=127.06283102249932&radius=20000',
+                headers: headers
+            };
+            request(options, function(err, res, body) {
+                console.log(body);
+            })
+
+            console.log("final list");
+            console.log(mylist);
+            res.status(200);
+            res.json([{
+                "place_name": "카카오프렌즈 코엑스점",
+                "distance": "418",
+                "place_url": "http://place.map.kakao.com/26338954",
+                "category_name": "가정,생활 > 문구,사무용품 > 디자인문구 > 카카오프렌즈",
+                "address_name": "서울 강남구 삼성동 159",
+                "road_address_name": "서울 강남구 영동대로 513",
+                "id": "26338954",
+                "phone": "02-6002-1880",
+                "category_group_code": "",
+                "category_group_name": "",
+                "x": "127.05902969025047",
+                "y": "37.51207412593136"
+            }]);
+            //res.json(mylist);
+        });
+    })
+    
 })
 
-function findHate(from, condition){
-    let newlist = [];
-    for(let i in from){
-        let donothate = true;
-        for(let j in condition){
-            if(from[i].type == condition[j]){
-                donothate = false;
-                break;
-            }
-        }
-        if(donothate){
-            newlist.push(from[i]);
-        }
-    }
-    return newlist;
-}
-
-function findPref(from, condition){
-    let newlist = [];
-    for(let i in from){
-        for(let j in condition){
-            if(from[i].type == condition[j]){
-                list.push(from[i]);
-                break;
-            }
-        }
-    }
-    return newlist;
-}
-
-function findFromContents(from, content){
+function findPref(from, content){
     let newlist = [];
     for(let i in from){
         for(let j in content){
@@ -154,7 +161,7 @@ function getXY(lon, lat, map){
     return [x, y];
 }
 
-async function checkWeather(wdate, loc){
+function getWURL(wdate, loc){
     newhour = wdate.getHours();
     newminute = wdate.getMinutes();
     let url = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?serviceKey=mg9I4VBCmTi1FupAyPU4QJUjbv98AeUk7CUsce7asBAeDDKgPzQWd3PzXukCX2w2wObVx85vt2KkVqWbzXWfVQ%3D%3D";
@@ -170,10 +177,11 @@ async function checkWeather(wdate, loc){
         url += 0;
     }
     url += wdate.getDate();
+    url += "&base_time=";
     if(newhour < 10){
         url += 0;
     }
-    url += "&base_time=" + newhour;
+    url += newhour;
     if(newminute == 0){
         url += "00";
     }
@@ -182,8 +190,43 @@ async function checkWeather(wdate, loc){
     }
     url += "&nx=" + loc[0];
     url += "&ny=" + loc[1];
-    console.log(url);
+    return url;
+}
 
+function checkWeather(weatherinfo, start, end){
+    let raininfo = [];
+    for(let i in weatherinfo){
+        if (weatherinfo[i].category == "POP"){
+            raininfo.push(watherinfo[i]);
+        }
+    }
+    let i = 0;
+    starttime = start.getHours() * 100;
+    try{
+        while(i < 100 && parseInt(raininfo[i].fcstTime) < starttime){
+            i++;
+        }
+        i--;
+        while(i < 100 && parseInt(raininfo[i].fcstTime) < starttime){
+            if (raininfo[i].fcstValue >= 50){
+                return true;
+            }
+        }
+        return false;
+    }
+    catch{
+        return false;
+    }
+}
+
+function deleteOut(list){
+    let newlist = [];
+    for(i in list){
+        if(list[i].out == false){
+            newlist.push(list[i]);
+        }
+    }
+    return newlist;
 }
 
 var port = process.env.PORT || 5000;
