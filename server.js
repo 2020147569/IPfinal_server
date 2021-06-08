@@ -20,7 +20,7 @@ app.post('/', (req, res) => {
         res.status(404).send("prefer nothing?");
         res.end();
     }
-    Pref[0] = Pref[0].slice(10);
+    Pref[0] = Pref[0].slice(11);
     console.log(Pref);
     let people = parseInt(req.body.personnel);
     let pretime = req.body.from.split(":");
@@ -33,7 +33,6 @@ app.post('/', (req, res) => {
     predate.setHours(parseInt(pretime[0]), parseInt(pretime[1]));
     let latdate = new Date();
     latdate.setHours(parseInt(lattime[0]), parseInt(lattime[1]));
-    latdate.setHours(latdate.getHours() + 3);
     let hour = date.getHours();
     let minute = date.getMinutes();
     let newhour = hour;
@@ -96,6 +95,7 @@ app.post('/', (req, res) => {
             if(raining){
                 mylist = deleteOut(mylist);
             }
+            console.log(mylist);
             if(mylist.length == 0){
                 res.status(404);
                 res.json([]);
