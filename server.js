@@ -25,10 +25,8 @@ app.post('/', (req, res) => {
     let pretime = req.body.from.split(":");
     let lattime = req.body.to.split(":");
     let mylist = [];
-    let lon = parseInt(req.body.longitude);
-    let lat = parseInt(req.body.latitude);
-    console.log(lon);
-    console.log(lat);
+    let lon = parseFloat(req.body.longitude);
+    let lat = parseFloat(req.body.latitude);
     let date = new Date();
     let newtime = date.getTime();
     newtime += 9 * 60 * 60 * 1000;
@@ -111,7 +109,6 @@ app.post('/', (req, res) => {
                     url: surl + encodeURI(mylist[0].type),
                     headers: headers
                 };
-                console.log(options.url);
                 request(options, function(err, res, body) {
                     body = JSON.parse(body);
                     if(body.documents != undefined && body.documents.length != 0){
@@ -131,7 +128,6 @@ app.post('/', (req, res) => {
                             url: surl + encodeURI(mylist[i].type),
                             headers: headers
                         };
-                        console.log(options.url);
                         request(options, function(err, res, body) {
                             body = JSON.parse(body);
                             if(body.documents != undefined && body.documents.length != 0){
