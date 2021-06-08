@@ -148,7 +148,6 @@ app.post('/', (req, res) => {
                 })
             }
             mypro[mylist.length - 1].then(function(ra){
-                console.log(ra);
                 ra = ra.sort((a, b) => a.priority - b.priority);
                 res.json(ra);
             })
