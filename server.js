@@ -11,13 +11,12 @@ app.use(express.urlencoded());
 app.use(cors());
 
 app.post('/', (req, res) => {
-    console.log(decodeURI(req.body));
-    req.body = JSON.parse(decodeURI(req.body));
+    console.log(req.body);
     if(req.body.preference.length == 0){
         res.status(404).send("prefer nothing?");
         res.end();
     }
-    let Pref = req.body.preference.split("&preference=");
+    let Pref = decodeURI(req.body.preference).split("&preference=");
     if(Pref.length == 0){
         res.status(404).send("prefer nothing?");
         res.end();
