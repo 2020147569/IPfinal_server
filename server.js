@@ -7,8 +7,8 @@ const cors = require('cors');
 var headers = {'Authorization': 'KakaoAK 1e92017a6f706280b10c46c94dfebd78'};
 
 app.use(express.json());
-app.use(express.urlencoded());
-app.use(cors({extended:true}));
+app.use(express.urlencoded({extended:true}));
+app.use(cors());
 
 app.post('/', (req, res) => {
     if(req.body.preference.length == 0){
