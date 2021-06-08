@@ -11,21 +11,27 @@ app.use(express.urlencoded());
 app.use(cors());
 
 app.post('/', (req, res) => {
-    console.log(req.body);
-    res.send(req.body);
-})
-//app.get('/', async(req, res) => {
-    /*let category = req.body.category;
-    let people = req.body.pnum;
-    let time = req.body.time;
+    if(Pref.body.preference.length == 0){
+        res.status(404).send("prefer nothing?");
+        res.end();
+    }
+    let Pref = req.body.preference.split("&preference=");
+    if(Pref.length == 0){
+        res.status(404).send("prefer nothing?");
+        res.end();
+    }
+    Pref[0] = Pref[0].slice(10);
+    let people = req.body.personnel;
+    let pretime = req.body.from.split(":");
+    let lattime = req.body.to.split(":");
     let mylist = [];
-    let prefer = req.body.prefer;
-    let hate = req.body.hate;
-    let lon = req.body.lon;
-    let lat = req.body.lat;*/
-    /*let date = new Date();
+    let lon = req.body.longitude;
+    let lat = req.body.latitude;
+    let date = new Date();
     let predate = new Date();
+    predate.setHours(pretime[0], pretime[1]);
     let latdate = new Date();
+    latdate.setHours(lattime[0], lattime[1]);
     latdate.setHours(latdate.getHours() + 3);
     let hour = date.getHours();
     let minute = date.getMinutes();
@@ -40,10 +46,13 @@ app.post('/', (req, res) => {
     let wdate = new Date();
     wdate.setHours(newhour, newminute);
     var mylist;
-    let category = ["양식", "중식", "일식", "PC방", "볼링장", "노래방", "코인 노래방", "공원", "당구장", "방탈출", "박물관", "보드 게임 카페", "카페", "주점", "미술관", "연극극장", "백화점", "마사지", "아쿠아리움", "사진관", "만화카페"];
+    let Pref = ["양식", "중식", "일식", "PC방", "볼링장", "노래방", "코인 노래방", "공원", "당구장", "방탈출", "박물관", "보드 게임 카페", "카페", "주점", "미술관", "연극극장", "백화점", "마사지", "아쿠아리움", "사진관", "만화카페"];
     let map = new Object();
     let lon = 126.929810;
     let lat = 37.488201;
+    let time = latdate.getTime() - predate.getTime();
+    time /= (1000 * 60 * 60);
+    let people = 4;
     map.Re = 6371.00877;
     map.grid = 5.0;
     map.slat1 = 30.0;
@@ -85,40 +94,91 @@ app.post('/', (req, res) => {
                 res.end();
             }
             let contents = JSON.parse(data);
-            mylist = findPref(category, contents);
+            mylist = findPref(Pref, contents);
+            mylist = deleteByTime(mylist, time);
+            mylist = deleteByPeople(mylist, people);
             if(raining){
                 mylist = deleteOut(mylist);
             }
-            var options = {
-                url: 'https://dapi.kakao.com/v2/local/search/keyword.json?y=37.514322572335935&x=127.06283102249932&radius=20000',
-                headers: headers
-            };
-            request(options, function(err, res, body) {
-                console.log(body);
+            if(mylist.length == 0){
+                res.status(404);
+                res.json([]);
+            }
+            let resultarray = [];
+            let surl = "https://dapi.kakao.com/v2/local/search/keyword.json?size=5&y=" + lat + "&x=" + lon + "&query="
+            var mypro = [];
+            mypro[0] = new Promise(function(resolve, reject){
+                var options = {
+                    url: surl + encodeURI(mylist[0].type),
+                    headers: headers
+                };
+                request(options, function(err, res, body) {
+                    body = JSON.parse(body);
+                    if(body.documents != undefined && body.documents.length != 0){
+                        let tmp = body.documents;
+                        for (index in tmp){
+                            tmp[index].priority = calcPrior(time, Math.max(mylist[0].min, 1), parseInt(tmp[index].distance));
+                        }
+                        resultarray = tmp;
+                    }
+                    resolve(resultarray);
+                })
             })
-
-            console.log("final list");
-            console.log(mylist);
-            res.status(200);
-            res.json([{
-                "place_name": "카카오프렌즈 코엑스점",
-                "distance": "418",
-                "place_url": "http://place.map.kakao.com/26338954",
-                "category_name": "가정,생활 > 문구,사무용품 > 디자인문구 > 카카오프렌즈",
-                "address_name": "서울 강남구 삼성동 159",
-                "road_address_name": "서울 강남구 영동대로 513",
-                "id": "26338954",
-                "phone": "02-6002-1880",
-                "category_group_code": "",
-                "category_group_name": "",
-                "x": "127.05902969025047",
-                "y": "37.51207412593136"
-            }]);
-            //res.json(mylist);
+            for(let i = 1; i < mylist.length; i++){
+                mypro[i] = new Promise(function(resolve, reject){
+                    mypro[i - 1].then(function(ra){
+                        var options = {
+                            url: surl + encodeURI(mylist[i].type),
+                            headers: headers
+                        };
+                        request(options, function(err, res, body) {
+                            body = JSON.parse(body);
+                            if(body.documents != undefined && body.documents.length != 0){
+                                let tmp = body.documents;
+                                for (index in tmp){
+                                    tmp[index].priority = calcPrior(time, Math.max(mylist[i].min, 1), parseInt(tmp[index].distance));
+                                }
+                                ra = ra.concat(tmp);
+                            }
+                            resolve(ra);
+                        })
+                    })
+                })
+            }
+            mypro[mylist.length - 1].then(function(ra){
+                ra = ra.sort((a, b) => a.priority - b.priority);
+                res.json(ra);
+            })
         });
     })
-    
 })
+
+function calcPrior(set, spend, move){
+    let numToReturn = set*60*60 - spend*60*60;
+    numToReturn += 5 * move / 1.1;
+    numToReturn += 10 * move / 1.1 / set;
+    return numToReturn;
+}
+
+function deleteByPeople(list, people){
+    let newlist = [];
+    for(i in list){
+        if(list[i].limit >= people){
+            newlist.push(list[i]);
+        }
+    }
+    return newlist;
+}
+
+function deleteByTime(list, time){
+    let newlist = [];
+    for(i in list){
+        if(list[i].min < time && list[i].max > time){
+            newlist.push(list[i]);
+        }
+    }
+    return newlist;
+}
 
 function findPref(from, content){
     let newlist = [];
@@ -231,7 +291,7 @@ function deleteOut(list){
         }
     }
     return newlist;
-}*/
+}
 
 var port = process.env.PORT || 5000;
 app.listen(port, function(){

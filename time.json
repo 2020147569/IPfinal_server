@@ -2,7 +2,6 @@
 {"type": "중식" , "min": 1, "max":2, "limit": 4, "out": false},
 {"type": "일식" , "min": 1, "max":2, "limit": 4, "out": false},
 {"type": "한식" , "min": 1, "max":2, "limit": 4, "out": false},
-{"type": "기타" , "min": 1, "max":2, "limit": 4, "out": false},
 {"type": "뷔페" , "min": 2, "max":3, "limit": 4, "out": false},
 {"type": "PC방" , "min": 0, "max":24, "limit": 4, "out": false},
 {"type": "볼링장" , "min": 0.5, "max":24, "limit": 4, "out": false},
