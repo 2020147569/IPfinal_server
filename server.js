@@ -21,7 +21,6 @@ app.post('/', (req, res) => {
         res.end();
     }
     Pref[0] = Pref[0].slice(11);
-    console.log(Pref);
     let people = parseInt(req.body.personnel);
     let pretime = req.body.from.split(":");
     let lattime = req.body.to.split(":");
@@ -29,6 +28,7 @@ app.post('/', (req, res) => {
     let lon = parseInt(req.body.longitude);
     let lat = parseInt(req.body.latitude);
     let date = new Date();
+    console.log(date);
     let predate = new Date();
     predate.setHours(parseInt(pretime[0]), parseInt(pretime[1]));
     let latdate = new Date();
@@ -95,7 +95,6 @@ app.post('/', (req, res) => {
             if(raining){
                 mylist = deleteOut(mylist);
             }
-            console.log(mylist);
             if(mylist.length == 0){
                 res.status(404);
                 res.json([]);
