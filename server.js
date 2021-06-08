@@ -20,6 +20,7 @@ app.post('/', (req, res) => {
         res.status(404).send("prefer nothing?");
         res.end();
     }
+    console.log(decodeURI(req.body));
     Pref[0] = Pref[0].slice(10);
     let people = req.body.personnel;
     let pretime = req.body.from.split(":");
