@@ -7,8 +7,8 @@ const cors = require('cors');
 var headers = {'Authorization': 'KakaoAK 1e92017a6f706280b10c46c94dfebd78'};
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-app.use(cors());
+app.use(express.urlencoded());
+app.use(cors({extended:true}));
 
 app.post('/', (req, res) => {
     if(req.body.preference.length == 0){
@@ -108,9 +108,10 @@ app.post('/', (req, res) => {
             var mypro = [];
             mypro[0] = new Promise(function(resolve, reject){
                 var options = {
-                    url: surl + mylist[0].type,
+                    url: surl + encodeURI(mylist[0].type),
                     headers: headers
                 };
+                console.log(options.url);
                 request(options, function(err, res, body) {
                     body = JSON.parse(body);
                     if(body.documents != undefined && body.documents.length != 0){
@@ -127,19 +128,20 @@ app.post('/', (req, res) => {
                 mypro[i] = new Promise(function(resolve, reject){
                     mypro[i - 1].then(function(ra){
                         var options = {
-                            url: surl + mylist[i].type,
+                            url: surl + encodeURI(mylist[i].type),
                             headers: headers
                         };
+                        console.log(options.url);
                         request(options, function(err, res, body) {
                             body = JSON.parse(body);
                             if(body.documents != undefined && body.documents.length != 0){
                                 let tmp = body.documents;
+                                console.log(tmp);
                                 for (index in tmp){
                                     tmp[index].priority = calcPrior(time, Math.max(mylist[i].min, 1), parseInt(tmp[index].distance));
                                 }
                                 ra = ra.concat(tmp);
                             }
-                            console.log(ra);
                             resolve(ra);
                         })
                     })
