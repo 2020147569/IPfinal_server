@@ -11,7 +11,6 @@ app.use(express.urlencoded());
 app.use(cors());
 
 app.post('/', (req, res) => {
-    console.log(req.body);
     if(req.body.preference.length == 0){
         res.status(404).send("prefer nothing?");
         res.end();
@@ -22,17 +21,18 @@ app.post('/', (req, res) => {
         res.end();
     }
     Pref[0] = Pref[0].slice(10);
-    let people = req.body.personnel;
+    console.log(Pref);
+    let people = parseInt(req.body.personnel);
     let pretime = req.body.from.split(":");
     let lattime = req.body.to.split(":");
     let mylist = [];
-    let lon = req.body.longitude;
-    let lat = req.body.latitude;
+    let lon = parseInt(req.body.longitude);
+    let lat = parseInt(req.body.latitude);
     let date = new Date();
     let predate = new Date();
-    predate.setHours(pretime[0], pretime[1]);
+    predate.setHours(parseInt(pretime[0]), parseInt(pretime[1]));
     let latdate = new Date();
-    latdate.setHours(lattime[0], lattime[1]);
+    latdate.setHours(parseInt(lattime[0]), parseInt(lattime[1]));
     latdate.setHours(latdate.getHours() + 3);
     let hour = date.getHours();
     let minute = date.getMinutes();
@@ -148,6 +148,8 @@ app.post('/', (req, res) => {
         });
     })
 })
+
+
 
 function calcPrior(set, spend, move){
     let numToReturn = set*60*60 - spend*60*60;
