@@ -102,7 +102,7 @@ app.post('/', (req, res) => {
                 res.json([]);
             }
             let resultarray = [];
-            let surl = "https://dapi.kakao.com/v2/local/search/keyword.json?size=5&y=" + lat + "&x=" + lon + "&query="
+            let surl = "https://dapi.kakao.com/v2/local/search/keyword.json?size=5&radius=1000&y=" + lat + "&x=" + lon + "&query="
             var mypro = [];
             mypro[0] = new Promise(function(resolve, reject){
                 var options = {
