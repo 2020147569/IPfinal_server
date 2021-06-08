@@ -28,7 +28,11 @@ app.post('/', (req, res) => {
     let lon = parseInt(req.body.longitude);
     let lat = parseInt(req.body.latitude);
     let date = new Date();
-    date.setTime(date.getTime() + 9 * 60 * 60 * 1000);
+    let newtime = date.getTime();
+    console.log(newtime);
+    newtime += 9 * 60 * 60 * 1000;
+    console.log(newtime);
+    date.setTime(newtime);
     console.log(date);
     let predate = new Date();
     predate.setTime(date.getTime() + 9 * 60 * 60 * 1000);
