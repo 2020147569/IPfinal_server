@@ -27,6 +27,8 @@ app.post('/', (req, res) => {
     let mylist = [];
     let lon = parseInt(req.body.longitude);
     let lat = parseInt(req.body.latitude);
+    console.log(lon);
+    console.log(lat);
     let date = new Date();
     let newtime = date.getTime();
     newtime += 9 * 60 * 60 * 1000;
@@ -106,7 +108,7 @@ app.post('/', (req, res) => {
             var mypro = [];
             mypro[0] = new Promise(function(resolve, reject){
                 var options = {
-                    url: surl + encodeURI(mylist[0].type),
+                    url: surl + mylist[0].type,
                     headers: headers
                 };
                 request(options, function(err, res, body) {
@@ -125,7 +127,7 @@ app.post('/', (req, res) => {
                 mypro[i] = new Promise(function(resolve, reject){
                     mypro[i - 1].then(function(ra){
                         var options = {
-                            url: surl + encodeURI(mylist[i].type),
+                            url: surl + mylist[i].type,
                             headers: headers
                         };
                         request(options, function(err, res, body) {
