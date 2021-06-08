@@ -45,14 +45,9 @@ app.post('/', (req, res) => {
     }
     let wdate = new Date();
     wdate.setHours(newhour, newminute);
-    var mylist;
-    let Pref = ["양식", "중식", "일식", "PC방", "볼링장", "노래방", "코인 노래방", "공원", "당구장", "방탈출", "박물관", "보드 게임 카페", "카페", "주점", "미술관", "연극극장", "백화점", "마사지", "아쿠아리움", "사진관", "만화카페"];
     let map = new Object();
-    let lon = 126.929810;
-    let lat = 37.488201;
     let time = latdate.getTime() - predate.getTime();
     time /= (1000 * 60 * 60);
-    let people = 4;
     map.Re = 6371.00877;
     map.grid = 5.0;
     map.slat1 = 30.0;
