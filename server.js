@@ -28,10 +28,13 @@ app.post('/', (req, res) => {
     let lon = parseInt(req.body.longitude);
     let lat = parseInt(req.body.latitude);
     let date = new Date();
+    date.setTime(date.getTime() + 9 * 60 * 60 * 1000);
     console.log(date);
     let predate = new Date();
+    predate.setTime(date.getTime() + 9 * 60 * 60 * 1000);
     predate.setHours(parseInt(pretime[0]), parseInt(pretime[1]));
     let latdate = new Date();
+    latdate.setTime(date.getTime() + 9 * 60 * 60 * 1000);
     latdate.setHours(parseInt(lattime[0]), parseInt(lattime[1]));
     let hour = date.getHours();
     let minute = date.getMinutes();
