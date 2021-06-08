@@ -8,7 +8,7 @@ var headers = {'Authorization': 'KakaoAK 1e92017a6f706280b10c46c94dfebd78'};
 
 app.use(express.json());
 app.use(express.urlencoded());
-app.use(cors());
+app.use(cors({extended:true}));
 
 app.post('/', (req, res) => {
     if(req.body.preference.length == 0){
@@ -31,13 +31,10 @@ app.post('/', (req, res) => {
     let newtime = date.getTime();
     newtime += 9 * 60 * 60 * 1000;
     date.setTime(newtime);
-    console.log(date);
     let predate = new Date(newtime);
     predate.setHours(parseInt(pretime[0]), parseInt(pretime[1]));
-    console.log(predate);
     let latdate = new Date(newtime);
     latdate.setHours(parseInt(lattime[0]), parseInt(lattime[1]));
-    console.log(latdate);
     let hour = date.getHours();
     let minute = date.getMinutes();
     let newhour = hour;
