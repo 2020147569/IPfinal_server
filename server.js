@@ -132,7 +132,6 @@ app.post('/', (req, res) => {
                             body = JSON.parse(body);
                             if(body.documents != undefined && body.documents.length != 0){
                                 let tmp = body.documents;
-                                console.log(tmp);
                                 for (index in tmp){
                                     tmp[index].priority = calcPrior(time, Math.max(mylist[i].min, 1), parseInt(tmp[index].distance));
                                 }
