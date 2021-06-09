@@ -259,13 +259,15 @@ function checkWeather(weatherinfo, start, end){
         }
     }
     let i = 0;
-    starttime = start.getHours() * 100;
+    let starttime = start.getHours() * 100 - 100;
+    let date = start.getFullYear() * 10000 + (start.getMonth() + 1) * 100 + start.getDate();
     try{
-        while(i < 100 && parseInt(raininfo[i].fcstTime) < starttime){
+        while(i < 100 && parseInt(raininfo[i].fcstTime) < starttime && (parseInt(raininfo[i].fcstDate) == date)){
             i++;
         }
         i--;
-        while(i < 100 && parseInt(raininfo[i].fcstTime) < starttime){
+        let endtime = end.getHours() * 100 + 100;
+        while(i < 100 && parseInt(raininfo[i].fcstTime) < starttime && (parseInt(raininfo[i].fcstDate) == date)){
             if (raininfo[i].fcstValue >= 50){
                 return true;
             }
