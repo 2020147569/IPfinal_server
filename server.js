@@ -266,7 +266,7 @@ function checkWeather(weatherinfo, start, end){
         }
         i--;
         let endtime = end.getHours() * 100 + 100;
-        while(i < 100 && parseInt(raininfo[i].fcstTime) < starttime && (parseInt(raininfo[i].fcstDate) == date)){
+        while(i < 100 && parseInt(raininfo[i].fcstTime) < endtime && (parseInt(raininfo[i].fcstDate) == date)){
             if (raininfo[i].fcstValue >= 50){
                 return true;
             }
