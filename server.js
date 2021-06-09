@@ -11,17 +11,7 @@ app.use(express.urlencoded({extended:true}));
 app.use(cors());
 
 app.post('/', (req, res) => {
-    if(req.body.preference.length == 0){
-        res.status(404).send("prefer nothing?");
-        res.end();
-        return;
-    }
     let Pref = decodeURI(req.body.preference).split("&preference=");
-    if(Pref.length == 0){
-        res.status(404).send("prefer nothing?");
-        res.end();
-        return;
-    }
     Pref[0] = Pref[0].slice(11);
     let people = parseInt(req.body.personnel);
     let pretime = req.body.from.split(":");
@@ -101,7 +91,6 @@ app.post('/', (req, res) => {
                 mylist = deleteOut(mylist);
             }
             if(mylist.length == 0){
-                res.status(404);
                 res.json([]);
                 return;
             }
