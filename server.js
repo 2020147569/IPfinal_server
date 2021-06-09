@@ -14,11 +14,13 @@ app.post('/', (req, res) => {
     if(req.body.preference.length == 0){
         res.status(404).send("prefer nothing?");
         res.end();
+        return;
     }
     let Pref = decodeURI(req.body.preference).split("&preference=");
     if(Pref.length == 0){
         res.status(404).send("prefer nothing?");
         res.end();
+        return;
     }
     Pref[0] = Pref[0].slice(11);
     let people = parseInt(req.body.personnel);
@@ -89,6 +91,7 @@ app.post('/', (req, res) => {
                 console.log(err);
                 res.status(404).send(err);
                 res.end();
+                return;
             }
             let contents = JSON.parse(data);
             mylist = findPref(Pref, contents);
@@ -100,6 +103,7 @@ app.post('/', (req, res) => {
             if(mylist.length == 0){
                 res.status(404);
                 res.json([]);
+                return;
             }
             let resultarray = [];
             let surl = "https://dapi.kakao.com/v2/local/search/keyword.json?size=5&y=" + lat + "&x=" + lon + "&query="
@@ -145,6 +149,7 @@ app.post('/', (req, res) => {
             mypro[mylist.length - 1].then(function(ra){
                 ra = ra.sort((a, b) => a.priority - b.priority);
                 res.json(ra);
+                return;
             })
         });
     })
