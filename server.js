@@ -94,7 +94,6 @@ app.post('/', (req, res) => {
                 res.json([]);
                 return;
             }
-            console.log(mylist);
             let resultarray = [];
             let surl = "https://dapi.kakao.com/v2/local/search/keyword.json?size=5&y=" + lat + "&x=" + lon + "&query="
             var mypro = [];
