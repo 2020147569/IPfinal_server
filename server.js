@@ -13,7 +13,6 @@ app.use(cors());
 app.post('/', (req, res) => {
     let Pref = decodeURI(req.body.preference).split("&preference=");
     Pref[0] = Pref[0].slice(11);
-    console.log(Pref);
     let people = parseInt(req.body.personnel);
     let pretime = req.body.from.split(":");
     let lattime = req.body.to.split(":");
@@ -95,6 +94,7 @@ app.post('/', (req, res) => {
                 res.json([]);
                 return;
             }
+            console.log(mylist);
             let resultarray = [];
             let surl = "https://dapi.kakao.com/v2/local/search/keyword.json?size=5&y=" + lat + "&x=" + lon + "&query="
             var mypro = [];
