@@ -11,8 +11,7 @@ app.use(express.urlencoded({extended:true}));
 app.use(cors());
 
 app.post('/', (req, res) => {
-    let Pref = decodeURI(req.body.preference).split("&preference=");
-    Pref[0] = Pref[0].slice(11);
+    let Pref = req.body.preference;
     let people = parseInt(req.body.personnel);
     let pretime = req.body.from.split(":");
     let lattime = req.body.to.split(":");
