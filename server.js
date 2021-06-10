@@ -165,7 +165,7 @@ function deleteByPeople(list, people){
 function deleteByTime(list, time){
     let newlist = [];
     for(i in list){
-        if(list[i].min < time && list[i].max > time){
+        if(list[i].min <= time && list[i].max >= time){
             newlist.push(list[i]);
         }
     }
